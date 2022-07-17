@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx nodemon index.js"
+    "test": "npx nodemon mock.js"
   },
   "repository": {
     "type": "git",

@@ -97,5 +97,5 @@ async function getlink(_merchant, _token, _cost, _initdays) {
 
 }
 
-module.exports = { getlink, calc_subs_month, calc_subs_week, substodays, userpendingtime, subscriptions, canuserpay, usertokenInfo, fetchMyids, totalids }
+module.exports = { getlink, calc_subs_month, calc_subs_week, substodays, userpendingtime, subscriptions, canuserpay, usertokenInfo, fetchMyids, totalids, abi }
 

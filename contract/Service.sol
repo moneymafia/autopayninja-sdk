@@ -17,6 +17,21 @@ interface IERC20 {
 }
 
 contract Service {
+    event Transfer(
+        address indexed token,
+        address indexed from,
+        address indexed to,
+        uint256 value
+    );
+
+    event Init(
+        uint256 id,
+        address indexed token,
+        address indexed owner,
+        address indexed merchant,
+        uint256 value
+    );
+
     uint256 private secondsinday = 60;
 
     uint256 public planIndex;
@@ -33,21 +48,21 @@ contract Service {
     mapping(uint256 => uint256) public subsalive;
 
     // get user allowance for token
-    function allowance(address _user, address token)
+    function allowance(address _user, address _token)
         public
         view
         returns (uint256)
     {
-        return IERC20(token).allowance(_user, address(this));
+        return IERC20(_token).allowance(_user, address(this));
     }
 
     // get user balance of token
-    function balance_user(address _user, address token)
+    function balance_user(address _user, address _token)
         public
         view
         returns (uint256)
     {
-        return IERC20(token).balanceOf(_user);
+        return IERC20(_token).balanceOf(_user);
     }
 
     // check if the user has enough tokens to pay for the subscription
@@ -70,7 +85,7 @@ contract Service {
     }
 
     // get the number of seconds unpaid in the subscription
-    function user_pending_secs(uint256 _id) public view returns (uint256) {
+    function pending_secs(uint256 _id) public view returns (uint256) {
         if (block.timestamp > subsalive[_id]) {
             return block.timestamp - subsalive[_id];
         } else {
@@ -98,6 +113,8 @@ contract Service {
         );
 
         IERC20(_token).transferFrom(_owner, _merchant, _amount);
+        
+        emit Transfer(_token, _owner, _merchant, _amount);
     }
 
     // initialize the subscription service /// _initdays should be 0 if no advance payment
@@ -125,6 +142,8 @@ contract Service {
         subsalive[planIndex] = block.timestamp;
 
         planIndex += 1;
+
+        emit Init(planIndex - 1, _token, msg.sender, _merchant, _cost);
     }
 
     // close subscription

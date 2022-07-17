@@ -4,7 +4,7 @@ const ethers = require('ethers')
 
 const provide = new ethers.providers.EtherscanProvider('ropsten')
 
-const contract_work = new ethers.Contract("0x8b41e67D6968327664Cf9313b136A0B076000214", abi, provide)
+const contract_work = new ethers.Contract("0x2c6128DF557FcF2FAB0Ffd8CAE5094aDE6776fF4", abi, provide)
 
 async function totalids() {
     var data = await contract_work.planIndex();
@@ -13,7 +13,7 @@ async function totalids() {
 }
 
 async function userpendingtime(_id) {
-    var data = await contract_work.user_pending_secs(_id);
+    var data = await contract_work.pending_secs(_id);
 
     return { "seconds": data.toString(), "days": data.div(60).toString() }
 }

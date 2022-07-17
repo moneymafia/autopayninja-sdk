@@ -113,7 +113,7 @@ contract Service {
         );
 
         IERC20(_token).transferFrom(_owner, _merchant, _amount);
-        
+
         emit Transfer(_token, _owner, _merchant, _amount);
     }
 

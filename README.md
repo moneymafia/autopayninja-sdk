@@ -1,5 +1,4 @@
-# autopayninja-sdk
-Auto Pay Ninja SDK
+# Auto Pay Ninja SDK
 
 
 

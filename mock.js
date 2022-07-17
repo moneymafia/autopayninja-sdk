@@ -29,7 +29,7 @@ async function test() {
     var a = await fetchMyids("0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301");
     console.log(a)
 
-    var a = await fetchMyids("0x06C3879882D06002d5582fC71d1150F60b1e8568");
+    var a = await fetchMyids("0x000000000000000000000000000000000000dEaD");
     console.log(a)
 
 }

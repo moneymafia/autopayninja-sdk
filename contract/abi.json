@@ -70,6 +70,65 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			}
+		],
+		"name": "txn_close",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_token",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_merchant",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_cost",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_initdays",
+				"type": "uint256"
+			}
+		],
+		"name": "txn_init",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_days",
+				"type": "uint256"
+			}
+		],
+		"name": "txn_run",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_user",
 				"type": "address"
@@ -160,7 +219,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "planIndex",
+		"name": "sub_index",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -169,24 +228,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_days",
-				"type": "uint256"
-			}
-		],
-		"name": "process_txn",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -240,47 +281,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
-			}
-		],
-		"name": "txn_close",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_token",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_merchant",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_cost",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_initdays",
-				"type": "uint256"
-			}
-		],
-		"name": "txn_init",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

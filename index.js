@@ -4,10 +4,10 @@ const ethers = require('ethers')
 
 const provide = new ethers.providers.EtherscanProvider('ropsten')
 
-const contract_work = new ethers.Contract("0x2c6128DF557FcF2FAB0Ffd8CAE5094aDE6776fF4", abi, provide)
+const contract_work = new ethers.Contract("0x15068063F353D946462BCEb9464A8Dce23B9814d", abi, provide)
 
 async function totalids() {
-    var data = await contract_work.planIndex();
+    var data = await contract_work.sub_index();
 
     return data
 }

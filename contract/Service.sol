@@ -34,7 +34,7 @@ contract Service {
 
     uint256 private secondsinday = 60;
 
-    uint256 public planIndex;
+    uint256 public sub_index;
 
     struct Plan {
         address owner;
@@ -137,13 +137,13 @@ contract Service {
             cost: _cost
         });
 
-        subscriptions[planIndex] = newSubscription;
+        subscriptions[sub_index] = newSubscription;
 
-        subsalive[planIndex] = block.timestamp;
+        subsalive[sub_index] = block.timestamp;
 
-        planIndex += 1;
+        emit Init(sub_index, _token, msg.sender, _merchant, _cost);
 
-        emit Init(planIndex - 1, _token, msg.sender, _merchant, _cost);
+        sub_index += 1;
     }
 
     // close subscription
@@ -159,7 +159,7 @@ contract Service {
     }
 
     // process subscription
-    function process_txn(uint256 _id, uint256 _days) external {
+    function txn_run(uint256 _id, uint256 _days) external {
         Plan memory subscription = subscriptions[_id];
 
         require(_days > 0);

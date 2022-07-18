@@ -1,3 +1,5 @@
+const axios = require('axios');
+
 const abi = require('./contract/abi.json');
 
 const ethers = require('ethers');
@@ -106,4 +108,56 @@ async function getlink(_merchant, _token, _cost, _initdays) {
 	return null;
 }
 
-module.exports = { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids, fetchBysubs, totalids, abi };
+async function graphql_subs(objs) {
+	var data = await axios({
+		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		method: 'post',
+		data: {
+			query:
+				`
+		  {
+			inits(` +
+				objs +
+				`) {
+				id
+				subid
+				token
+				merchant
+				value
+				timestamp
+			  }
+		  }
+		  `,
+		},
+	}).then((res) => res.data.data.inits);
+
+	return data;
+}
+
+async function graphql_transfers(objs) {
+	var data = await axios({
+		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		method: 'post',
+		data: {
+			query:
+				`
+		  {
+			transfers(` +
+				objs +
+				`) {
+					id
+					token
+					from
+					to
+					value
+					timestamp
+			  }
+		  }
+		  `,
+		},
+	}).then((res) => res.data.data.transfers);
+
+	return data;
+}
+
+module.exports = { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids, fetchBysubs, totalids, abi, graphql_subs, graphql_transfers };

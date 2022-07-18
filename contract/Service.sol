@@ -100,7 +100,7 @@ contract Service {
         address _merchant,
         uint256 _amount
     ) internal {
-        require((_amount > 0), "Not an active subscription");
+        require((_amount > 0), "0 Amount");
 
         require(
             (IERC20(_token).balanceOf(_owner) >= _amount),
@@ -109,7 +109,7 @@ contract Service {
 
         require(
             (IERC20(_token).allowance(_owner, address(this)) >= _amount),
-            "Insufficient User Funds"
+            "Insufficient User Allowance"
         );
 
         IERC20(_token).transferFrom(_owner, _merchant, _amount);

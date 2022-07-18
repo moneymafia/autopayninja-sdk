@@ -1,4 +1,4 @@
-const { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids } = require('./index');
+const { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids, fetchBysubs } = require('./index');
 
 async function test() {
     var a = await getlink('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
@@ -14,6 +14,9 @@ async function test() {
     console.log(a);
 
     var a = await fetchMyids('0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
+    console.log(a);
+
+    var a = await fetchBysubs('0xaf270cd42722ecf59e347d7b0bdef4eb1d36cd1adc1477af33d5b73112f4d59b');
     console.log(a);
 }
 

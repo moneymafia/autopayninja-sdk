@@ -26,8 +26,12 @@ async function subscriptions(_id) {
 		valid = false;
 	}
 
+	//sha256 hash of string
+	var hash = ethers.utils.solidityKeccak256(['string'], [data.token + data.merchant + data.cost]);
+
 	return {
 		id: _id.toString(),
+		sub_id: hash.toString(),
 		token: data.token.toString(),
 		owner: data.owner.toString(),
 		merchant: data.merchant.toString(),
@@ -77,6 +81,22 @@ async function fetchMyids(_user) {
 	return { user: array_u, merchant: array_m };
 }
 
+async function fetchBysubs(_subid) {
+	var max = await totalids();
+
+	let array = [];
+
+	for (let index = 0; index < max; index++) {
+		var datax = await subscriptions(index);
+
+		if (datax.valid && datax.sub_id == _subid) {
+			array.push(index);
+		}
+	}
+
+	return { subs: array };
+}
+
 async function getlink(_merchant, _token, _cost, _initdays) {
 	if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
 		var initdays = _initdays || 0;
@@ -86,4 +106,4 @@ async function getlink(_merchant, _token, _cost, _initdays) {
 	return null;
 }
 
-module.exports = { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids, totalids, abi };
+module.exports = { getlink, subscriptions, canuserpay, usertokenInfo, fetchMyids, fetchBysubs, totalids, abi };

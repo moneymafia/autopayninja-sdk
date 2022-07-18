@@ -1,12 +1,9 @@
 # Auto Pay Ninja SDK
 
-
-
-
-## Install 
+### Install
 
 npm i moneymafia/autopayninja-sdk
 
-## Usage
+### Usage
 
 const {... } = require("autopayninja-sdk")

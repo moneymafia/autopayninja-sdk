@@ -79,7 +79,9 @@ async function fetchMyids(_user) {
 
 async function getlink(_merchant, _token, _cost, _initdays) {
 	if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
-		return `https://google.com/join?merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${_initdays}`;
+		var initdays = _initdays || 0;
+
+		return `https://google.com/join?merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
 	}
 	return null;
 }

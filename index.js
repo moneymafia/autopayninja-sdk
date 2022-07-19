@@ -4,17 +4,17 @@ const networks = {
 	3: {
 		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
 		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+		rpc: 'https://rpc.ankr.com/eth_ropsten',
 	},
 	56: {
 		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
 		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+		rpc: 'https://rpc.ankr.com/eth_ropsten',
 	},
 	137: {
 		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
 		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+		rpc: 'https://rpc.ankr.com/eth_ropsten	',
 	},
 };
 

@@ -1,3 +1,9 @@
+const networkID = 3;
+
+const networks = {
+	3: { contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d', graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja', rpc: '' },
+};
+
 const axios = require('axios');
 
 const abi = require('./contract/abi.json');
@@ -6,20 +12,20 @@ const ethers = require('ethers');
 
 const provide = new ethers.providers.EtherscanProvider('ropsten');
 
-const contract_work = new ethers.Contract('0x15068063F353D946462BCEb9464A8Dce23B9814d', abi, provide);
+const contract = new ethers.Contract(networks[networkID].contract, abi, provide);
 
 const secondsinaDay = 60;
 
 async function totalids() {
-	var data = await contract_work.sub_index();
+	var data = await contract.sub_index();
 
 	return data;
 }
 
 async function subscriptions(_id) {
-	var data = await contract_work.subscriptions(_id);
-	var datax = await contract_work.subsalive(_id);
-	var datay = await contract_work.pending_secs(_id);
+	var data = await contract.subscriptions(_id);
+	var datax = await contract.subsalive(_id);
+	var datay = await contract.pending_secs(_id);
 
 	var valid = false;
 	if (data.cost.toString() > 0) {
@@ -32,7 +38,7 @@ async function subscriptions(_id) {
 	var hash = ethers.utils.solidityKeccak256(['string'], [data.token + data.merchant + data.cost]);
 
 	return {
-		id: _id.toString(),
+		plan_id: _id.toString(),
 		sub_id: hash.toString(),
 		token: data.token.toString(),
 		owner: data.owner.toString(),
@@ -47,14 +53,14 @@ async function subscriptions(_id) {
 }
 
 async function canuserpay(_id, _days) {
-	var data = await contract_work.canuserpay(_id, _days);
+	var data = await contract.canuserpay(_id, _days);
 	return data.toString();
 }
 
 async function usertokenInfo(_token, _user) {
 	if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
-		var datax = await contract_work.balance_user(_user, _token);
-		var datap = await contract_work.allowance(_user, _token);
+		var datax = await contract.balance_user(_user, _token);
+		var datap = await contract.allowance(_user, _token);
 
 		return { balance: datax.toString(), allowance: datap.toString() };
 	}
@@ -103,14 +109,14 @@ async function getlink(_merchant, _token, _cost, _initdays) {
 	if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
 		var initdays = _initdays || 0;
 
-		return `https://google.com/join?merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
+		return `https://google.com/join?networkId=${networkID}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
 	}
 	return null;
 }
 
 async function graphql_subs(objs) {
 	var data = await axios({
-		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		url: networks[networkID].graph,
 		method: 'post',
 		data: {
 			query: `{ inits(${objs}) { id subid token merchant value timestamp} }`,
@@ -122,7 +128,7 @@ async function graphql_subs(objs) {
 
 async function graphql_transfers(objs) {
 	var data = await axios({
-		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		url: networks[networkID].graph,
 		method: 'post',
 		data: {
 			query: `{ transfers(${objs}) { id token from to value timestamp } }`,

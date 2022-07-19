@@ -1,4 +1,4 @@
-const networkID = 3;
+let networkID = 3;
 
 const networks = {
 	3: { contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d', graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja', rpc: '' },

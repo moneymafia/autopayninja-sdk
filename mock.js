@@ -28,4 +28,4 @@ async function test2() {
 	console.log(a);
 }
 
-test2();
+test();

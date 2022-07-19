@@ -1,7 +1,7 @@
 let networkID = 3;
 
 const networks = {
-	3: { contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d', graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja', rpc: '' },
+	3: { contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d', graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja', rpc: 'https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161' },
 };
 
 const axios = require('axios');
@@ -10,9 +10,9 @@ const abi = require('./contract/abi.json');
 
 const ethers = require('ethers');
 
-const provide = new ethers.providers.EtherscanProvider('ropsten');
+const provider = new ethers.providers.JsonRpcProvider(networks[networkID].rpc);
 
-const contract = new ethers.Contract(networks[networkID].contract, abi, provide);
+const contract = new ethers.Contract(networks[networkID].contract, abi, provider);
 
 const secondsinaDay = 60;
 

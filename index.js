@@ -113,21 +113,7 @@ async function graphql_subs(objs) {
 		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
 		method: 'post',
 		data: {
-			query:
-				`
-		  {
-			inits(` +
-				objs +
-				`) {
-				id
-				subid
-				token
-				merchant
-				value
-				timestamp
-			  }
-		  }
-		  `,
+			query: `{ inits(${objs}) { id subid token merchant value timestamp} }`,
 		},
 	}).then((res) => res.data.data.inits);
 
@@ -139,21 +125,7 @@ async function graphql_transfers(objs) {
 		url: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
 		method: 'post',
 		data: {
-			query:
-				`
-		  {
-			transfers(` +
-				objs +
-				`) {
-					id
-					token
-					from
-					to
-					value
-					timestamp
-			  }
-		  }
-		  `,
+			query: `{ transfers(${objs}) { id token from to value timestamp } }`,
 		},
 	}).then((res) => res.data.data.transfers);
 

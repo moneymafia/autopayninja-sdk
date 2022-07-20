@@ -1,41 +1,41 @@
-const {AutoPayNinjaSDK, ABI} = require("./index");
+const {AutoPayNinja, ABI, NETWORK} = require("./index");
 
 async function test() {
-  const autoPaySdk = new AutoPayNinjaSDK(3);
+  const sdk = new AutoPayNinja(3);
 
-  var a = await autoPaySdk.getSubscriptionLink(
+  var a = await sdk.getSubscriptionLink(
     "0x8b41e67D6968327664Cf9313b136A0B076000214",
     "0x8b41e67D6968327664Cf9313b136A0B076000214",
     "1"
   );
   console.log(a);
 
-  var a = await autoPaySdk.subscriptions(0);
+  var a = await sdk.subscriptions(0);
   console.log(a);
 
-  var a = await autoPaySdk.canUserPay(0, 4);
+  var a = await sdk.canUserPay(0, 4);
   console.log(a);
 
-  var a = await autoPaySdk.getUserTokenData(
+  var a = await sdk.getUserTokenData(
     "0x55349E0B114d305f94Cc1cbb2f574e7B5bEcDBd9",
     "0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301"
   );
   console.log(a);
 
-  var a = await autoPaySdk.getSubscriptionsByUser(
+  var a = await sdk.getSubscriptionsByUser(
     "0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301"
   );
   console.log(a);
 
-  var a = await autoPaySdk.getAllSubsciptionsById(
+  var a = await sdk.getAllSubsciptionsById(
     "0xaf270cd42722ecf59e347d7b0bdef4eb1d36cd1adc1477af33d5b73112f4d59b"
   );
   console.log(a);
 
-  var a = await autoPaySdk.graphSubscriptions("first: 5");
+  var a = await sdk.graphSubscriptions("first: 5");
   console.log(a);
 
-  var a = await autoPaySdk.graphTransfers("first: 5");
+  var a = await sdk.graphTransfers("first: 5");
   console.log(a);
 }
 

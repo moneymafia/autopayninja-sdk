@@ -1,158 +1,148 @@
-const axios = require("axios");
-const ABI = require("./contract/abi.json");
-const ethers = require("ethers");
+const axios = require('axios');
 
-const networks = {
-  3: {
-    contract: "0x15068063F353D946462BCEb9464A8Dce23B9814d",
-    graph: "https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja",
-    rpc: "https://rpc.ankr.com/eth_ropsten",
-  },
-  56: {
-    contract: "0x15068063F353D946462BCEb9464A8Dce23B9814d",
-    graph: "https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja",
-    rpc: "https://rpc.ankr.com/eth_ropsten",
-  },
-  137: {
-    contract: "0x15068063F353D946462BCEb9464A8Dce23B9814d",
-    graph: "https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja",
-    rpc: "https://rpc.ankr.com/eth_ropsten	",
-  },
+const ethers = require('ethers');
+
+const ABI = require('./contract/abi.json');
+
+const NETWORK = {
+	3: {
+		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
+		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		rpc: 'https://rpc.ankr.com/eth_ropsten',
+	},
+	56: {
+		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
+		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		rpc: 'https://rpc.ankr.com/eth_ropsten',
+	},
+	137: {
+		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
+		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
+		rpc: 'https://rpc.ankr.com/eth_ropsten	',
+	},
 };
 
-class AutoPayNinjaSDK {
+class AutoPayNinja {
+	chainId = null;
 
-  chainId = null;
+	contract = null;
 
-  contract = null;
+	secondsinaDay = 60;
 
-  secondsinaDay = 60;
+	// @param chainId: EVM Network ID
+	constructor(chainId) {
+		this.chainId = chainId;
 
+		const provider = new ethers.providers.JsonRpcProvider(NETWORK[chainId].rpc);
 
-  // @param chainId: EVM Network ID
-  constructor(chainId) {
+		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, provider);
+	}
 
-    this.chainId = chainId;
+	async totalIds() {
+		const data = await this.contract.sub_index();
+		return data;
+	}
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      networks[chainId].rpc
-    );
-	
-    this.contract = new ethers.Contract(
-      networks[chainId].contract,
-      ABI,
-      provider
-    );
-  }
+	async subscriptions(_id) {
+		const subs = await this.contract.subscriptions(_id);
+		const aliveDuration = await this.contract.subsalive(_id);
+		const pendingInSec = await this.contract.pending_secs(_id);
 
-  async totalIds() {
-    const data = await this.contract.sub_index();
-    return data;
-  }
+		let valid = subs.cost.toString().length > 0;
 
-  async subscriptions(_id) {
-    const subs = await this.contract.subscriptions(_id);
-    const aliveDuration = await this.contract.subsalive(_id);
-    const pendingInSec = await this.contract.pending_secs(_id);
+		//sha256 hash of string
+		const hash = ethers.utils.solidityKeccak256(['string'], [subs.token + subs.merchant + subs.cost]);
 
-    let valid = subs.cost.toString().length > 0;
+		return {
+			planId: _id.toString(),
+			subscriptionId: hash.toString(),
+			token: subs.token.toString(),
+			owner: subs.owner.toString(),
+			merchant: subs.merchant.toString(),
+			cost: subs.cost.toString(),
+			lastpaidInSec: aliveDuration.toString(),
+			unpaidInSec: pendingInSec.toString(),
+			unpaidInDay: pendingInSec.div(this.secondsinaDay).toString(),
+			unpaidCost: (subs.cost * pendingInSec.div(this.secondsinaDay)).toString(),
+			valid: valid,
+		};
+	}
 
-    //sha256 hash of string
-    const hash = ethers.utils.solidityKeccak256(
-      ["string"],
-      [subs.token + subs.merchant + subs.cost]
-    );
+	async canUserPay(_id, _days) {
+		const data = await this.contract.canuserpay(_id, _days);
+		return data.toString();
+	}
 
-    return {
-      planId: _id.toString(),
-      subscriptionId: hash.toString(),
-      token: subs.token.toString(),
-      owner: subs.owner.toString(),
-      merchant: subs.merchant.toString(),
-      cost: subs.cost.toString(),
-      lastpaidInSec: aliveDuration.toString(),
-      unpaidInSec: pendingInSec.toString(),
-      unpaidInDay: pendingInSec.div(this.secondsinaDay).toString(),
-      unpaidCost: (subs.cost * pendingInSec.div(this.secondsinaDay)).toString(),
-      valid: valid,
-    };
-  }
+	async getUserTokenData(_token, _user) {
+		if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
+			const datax = await this.contract.balance_user(_user, _token);
+			const datap = await this.contract.allowance(_user, _token);
+			return { balance: datax.toString(), allowance: datap.toString() };
+		}
+	}
 
-  async canUserPay(_id, _days) {
-    const data = await this.contract.canuserpay(_id, _days);
-    return data.toString();
-  }
+	async getSubscriptionsByUser(_user) {
+		const max = await this.totalIds();
+		const users = [];
+		const merchants = [];
 
-  async getUserTokenData(_token, _user) {
-    if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
-      const datax = await this.contract.balance_user(_user, _token);
-      const datap = await this.contract.allowance(_user, _token);
-      return { balance: datax.toString(), allowance: datap.toString() };
-    }
-  }
+		for (let index = 0; index < max; index++) {
+			const subs = await this.subscriptions(index);
+			if (subs.valid) {
+				if (subs.owner == _user) {
+					users.push(index);
+				}
+				if (subs.merchant == _user) {
+					merchants.push(index);
+				}
+			}
+		}
+		return { users, merchants };
+	}
 
-  async getSubscriptionsByUser(_user) {
-    const max = await this.totalIds();
-    const users = [];
-    const merchants = [];
+	async getAllSubsciptionsById(_subid) {
+		const max = await this.totalIds();
+		let subsciptions = [];
+		for (let index = 0; index < max; index++) {
+			const subs = await this.subscriptions(index);
+			if (subs.valid && subs.sub_id == _subid) {
+				subsciptions.push(index);
+			}
+		}
+		return { subsciptions };
+	}
 
-    for (let index = 0; index < max; index++) {
-      const subs = await this.subscriptions(index);
-      if (subs.valid) {
-        if (subs.owner == _user) {
-          users.push(index);
-        }
-        if (subs.merchant == _user) {
-          merchants.push(index);
-        }
-      }
-    }
-    return { users, merchants };
-  }
+	async getSubscriptionLink(_merchant, _token, _cost, _initdays) {
+		if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
+			const initdays = _initdays || 0;
+			return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
+		}
+		return null;
+	}
 
-  async getAllSubsciptionsById(_subid) {
-    const max = await this.totalIds();
-    let subsciptions = [];
-    for (let index = 0; index < max; index++) {
-      const subs = await this.subscriptions(index);
-      if (subs.valid && subs.sub_id == _subid) {
-        subsciptions.push(index);
-      }
-    }
-    return { subsciptions };
-  }
+	async graphSubscriptions(objs) {
+		const data = await axios({
+			url: NETWORK[this.chainId].graph,
+			method: 'post',
+			data: {
+				query: `{ inits(${objs}) { id subid token merchant value timestamp} }`,
+			},
+		}).then((res) => res.data.data.inits);
 
-  async getSubscriptionLink(_merchant, _token, _cost, _initdays) {
-    if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
-      const initdays = _initdays || 0;
-      return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
-    }
-    return null;
-  }
+		return data;
+	}
 
-  async graphSubscriptions(objs) {
-    const data = await axios({
-      url: networks[this.chainId].graph,
-      method: "post",
-      data: {
-        query: `{ inits(${objs}) { id subid token merchant value timestamp} }`,
-      },
-    }).then((res) => res.data.data.inits);
+	async graphTransfers(objs) {
+		var data = await axios({
+			url: NETWORK[this.chainId].graph,
+			method: 'post',
+			data: {
+				query: `{ transfers(${objs}) { id token from to value timestamp } }`,
+			},
+		}).then((res) => res.data.data.transfers);
 
-    return data;
-  }
-
-  async graphTransfers(objs) {
-    var data = await axios({
-      url: networks[this.chainId].graph,
-      method: "post",
-      data: {
-        query: `{ transfers(${objs}) { id token from to value timestamp } }`,
-      },
-    }).then((res) => res.data.data.transfers);
-
-    return data;
-  }
+		return data;
+	}
 }
 
-module.exports = {AutoPayNinjaSDK , ABI};
+module.exports = { AutoPayNinja, ABI, NETWORK };

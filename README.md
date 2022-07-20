@@ -9,7 +9,7 @@ npm i moneymafia/autopayninja-sdk
 ### Usage
 
 ```
-const {AutoPayNinjaSDK, ABI} = require("autopayninja-sdk")
+const {AutoPayNinja, ABI, NETWORK} = require("autopayninja-sdk")
 
-const sdk = new AutoPayNinjaSDK(3);
+const sdk = new AutoPayNinja(3);
 ```

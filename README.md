@@ -4,7 +4,6 @@
 
 ```
 npm i moneymafia/autopayninja-sdk
-
 ```
 
 ### Usage

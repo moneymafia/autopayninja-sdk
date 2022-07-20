@@ -9,6 +9,6 @@ npm i moneymafia/autopayninja-sdk
 
 const {AutoPayNinjaSDK, ABI} = require("autopayninja-sdk")
 
-const autoPaySdk = new AutoPayNinjaSDK(3);
+const sdk = new AutoPayNinjaSDK(3);
 
 ```

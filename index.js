@@ -38,6 +38,19 @@ class AutoPayNinja {
 		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, provider);
 	}
 
+	async suggestAllowance(_amount) {
+		var data = _amount * 365 * 5;
+		return data.toString();
+	}
+
+	async getUserTokenData(_token, _user) {
+		if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
+			const datax = await this.contract.balance_user(_user, _token);
+			const datap = await this.contract.allowance(_user, _token);
+			return { balance: datax.toString(), allowance: datap.toString() };
+		}
+	}
+
 	async totalIds() {
 		const data = await this.contract.sub_index();
 		return data;
@@ -67,14 +80,6 @@ class AutoPayNinja {
 	async canUserPay(_id, _days) {
 		const data = await this.contract.canuserpay(_id, _days);
 		return data.toString();
-	}
-
-	async getUserTokenData(_token, _user) {
-		if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
-			const datax = await this.contract.balance_user(_user, _token);
-			const datap = await this.contract.allowance(_user, _token);
-			return { balance: datax.toString(), allowance: datap.toString() };
-		}
 	}
 
 	async getSubscriptionsByUser(_user) {

@@ -1,9 +1,9 @@
 const { AutoPayNinja, ABI, NETWORK } = require('./index');
 
-async function test() {
-	const sdk = new AutoPayNinja(3);
+const sdk = new AutoPayNinja(3);
 
-  // Smart Contract Fetch
+async function test() {
+	// Smart Contract Fetch
 	var a = await sdk.subscriptions(0);
 	console.log(a);
 
@@ -32,9 +32,14 @@ async function test() {
 	var a = await sdk.graphTransfers(`where: {from: "0x23ed8bbed4fd61d25189ca921448fe15f1b04301"}`);
 	console.log(a);
 
-  // Get Shareble Sub Link
-  var a = await sdk.getSubscriptionLink('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
+	// Get Shareble Sub Link
+	var a = await sdk.getSubscriptionLink('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
 	console.log(a);
 }
 
-test();
+async function test2() {
+	var a = await sdk.suggestAllowance('100');
+	console.log(a);
+}
+
+test2();

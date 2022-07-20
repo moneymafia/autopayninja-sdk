@@ -1,5 +1,5 @@
 const axios = require("axios");
-const abi = require("./contract/abi.json");
+const ABI = require("./contract/abi.json");
 const ethers = require("ethers");
 
 const networks = {
@@ -21,17 +21,24 @@ const networks = {
 };
 
 class AutoPayNinjaSDK {
+
   chainId = 3;
+
   contract = null;
+
   secondsinaDay = 60;
+
   constructor({ chainId = 3 }) {
+
     this.chainId = chainId;
+
     const provider = new ethers.providers.JsonRpcProvider(
       networks[chainId].rpc
     );
+	
     this.contract = new ethers.Contract(
       networks[chainId].contract,
-      abi,
+      ABI,
       provider
     );
   }
@@ -146,4 +153,4 @@ class AutoPayNinjaSDK {
   }
 }
 
-module.exports = AutoPayNinjaSDK;
+module.exports = {AutoPayNinjaSDK , ABI};

@@ -1,7 +1,7 @@
-const AutoPaySdk = require("./index");
+const {AutoPayNinjaSDK, ABI} = require("./index");
 
 async function test() {
-  const autoPaySdk = new AutoPaySdk({ chainId: 3 });
+  const autoPaySdk = new AutoPayNinjaSDK({ chainId: 3 });
 
   var a = await autoPaySdk.getSubscriptionLink(
     "0x8b41e67D6968327664Cf9313b136A0B076000214",

@@ -22,13 +22,15 @@ const networks = {
 
 class AutoPayNinjaSDK {
 
-  chainId = 3;
+  chainId = null;
 
   contract = null;
 
   secondsinaDay = 60;
 
-  constructor({ chainId = 3 }) {
+
+  // @param chainId: EVM Network ID
+  constructor(chainId) {
 
     this.chainId = chainId;
 

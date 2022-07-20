@@ -17,9 +17,6 @@ async function test() {
 	var a = await sdk.getSubscriptionsByUser('0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
 	console.log(a);
 
-	var a = await sdk.getAllSubsciptionsById('0xaf270cd42722ecf59e347d7b0bdef4eb1d36cd1adc1477af33d5b73112f4d59b');
-	console.log(a);
-
 	// Faster Lookup for Entries
 	var a = await sdk.graphSubscriptions('first: 5');
 	console.log(a);

@@ -50,12 +50,8 @@ class AutoPayNinja {
 
 		let valid = subs.cost.toString().length > 0;
 
-		//sha256 hash of string
-		const hash = ethers.utils.solidityKeccak256(['string'], [subs.token + subs.merchant + subs.cost]);
-
 		return {
-			planId: _id.toString(),
-			subscriptionId: hash.toString(),
+			subId: _id.toString(),
 			token: subs.token.toString(),
 			owner: subs.owner.toString(),
 			merchant: subs.merchant.toString(),
@@ -98,18 +94,6 @@ class AutoPayNinja {
 			}
 		}
 		return { users, merchants };
-	}
-
-	async getAllSubsciptionsById(_subid) {
-		const max = await this.totalIds();
-		let subsciptions = [];
-		for (let index = 0; index < max; index++) {
-			const subs = await this.subscriptions(index);
-			if (subs.valid && subs.sub_id == _subid) {
-				subsciptions.push(index);
-			}
-		}
-		return { subsciptions };
 	}
 
 	async getSubscriptionLink(_merchant, _token, _cost, _initdays) {

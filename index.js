@@ -36,98 +36,93 @@ class AutoPayNinjaSDK {
     );
   }
 
-  async totalids() {
-    var data = await this.contract.sub_index();
+  async totalIds() {
+    const data = await this.contract.sub_index();
     return data;
   }
 
   async subscriptions(_id) {
-    var data = await this.contract.subscriptions(_id);
-    var datax = await this.contract.subsalive(_id);
-    var datay = await this.contract.pending_secs(_id);
+    const subs = await this.contract.subscriptions(_id);
+    const aliveDuration = await this.contract.subsalive(_id);
+    const pendingInSec = await this.contract.pending_secs(_id);
 
-    var valid = false;
-    if (data.cost.toString() > 0) {
-      valid = true;
-    } else {
-      valid = false;
-    }
+    let valid = subs.cost.toString().length > 0;
 
     //sha256 hash of string
-    var hash = ethers.utils.solidityKeccak256(
+    const hash = ethers.utils.solidityKeccak256(
       ["string"],
-      [data.token + data.merchant + data.cost]
+      [subs.token + subs.merchant + subs.cost]
     );
 
     return {
-      plan_id: _id.toString(),
-      sub_id: hash.toString(),
-      token: data.token.toString(),
-      owner: data.owner.toString(),
-      merchant: data.merchant.toString(),
-      cost: data.cost.toString(),
-      lastpaid_sec: datax.toString(),
-      unpaid_sec: datay.toString(),
-      unpaid_day: datay.div(this.secondsinaDay).toString(),
-      unpaid_cost: (data.cost * datay.div(this.secondsinaDay)).toString(),
+      planId: _id.toString(),
+      subscriptionId: hash.toString(),
+      token: subs.token.toString(),
+      owner: subs.owner.toString(),
+      merchant: subs.merchant.toString(),
+      cost: subs.cost.toString(),
+      lastpaidInSec: aliveDuration.toString(),
+      unpaidInSec: pendingInSec.toString(),
+      unpaidInDay: pendingInSec.div(this.secondsinaDay).toString(),
+      unpaidCost: (subs.cost * pendingInSec.div(this.secondsinaDay)).toString(),
       valid: valid,
     };
   }
 
-  async canuserpay(_id, _days) {
-    var data = await this.contract.canuserpay(_id, _days);
+  async canUserPay(_id, _days) {
+    const data = await this.contract.canuserpay(_id, _days);
     return data.toString();
   }
 
-  async usertokenInfo(_token, _user) {
+  async getUserTokenData(_token, _user) {
     if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
-      var datax = await this.contract.balance_user(_user, _token);
-      var datap = await this.contract.allowance(_user, _token);
+      const datax = await this.contract.balance_user(_user, _token);
+      const datap = await this.contract.allowance(_user, _token);
       return { balance: datax.toString(), allowance: datap.toString() };
     }
   }
 
-  async fetchMyids(_user) {
-    const max = await this.totalids();
+  async getSubscriptionsByUser(_user) {
+    const max = await this.totalIds();
     const users = [];
     const merchants = [];
 
     for (let index = 0; index < max; index++) {
-      const datax = await this.subscriptions(index);
-      if (datax.valid) {
-        if (datax.owner == _user) {
+      const subs = await this.subscriptions(index);
+      if (subs.valid) {
+        if (subs.owner == _user) {
           users.push(index);
         }
-        if (datax.merchant == _user) {
+        if (subs.merchant == _user) {
           merchants.push(index);
         }
       }
     }
-    return { user: users, merchant: merchants };
+    return { users, merchants };
   }
 
-  async fetchBysubs(_subid) {
-    var max = await this.totalids();
-    let array = [];
+  async getAllSubsciptionsById(_subid) {
+    const max = await this.totalIds();
+    let subsciptions = [];
     for (let index = 0; index < max; index++) {
-      var datax = await this.subscriptions(index);
-      if (datax.valid && datax.sub_id == _subid) {
-        array.push(index);
+      const subs = await this.subscriptions(index);
+      if (subs.valid && subs.sub_id == _subid) {
+        subsciptions.push(index);
       }
     }
-    return { subs: array };
+    return { subsciptions };
   }
 
-  async getlink(_merchant, _token, _cost, _initdays) {
+  async getSubscriptionLink(_merchant, _token, _cost, _initdays) {
     if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
-      var initdays = _initdays || 0;
-      return `https://google.com/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
+      const initdays = _initdays || 0;
+      return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
     }
     return null;
   }
 
-  async graphql_subs(objs) {
-    var data = await axios({
+  async graphSubscriptions(objs) {
+    const data = await axios({
       url: networks[this.chainId].graph,
       method: "post",
       data: {
@@ -138,7 +133,7 @@ class AutoPayNinjaSDK {
     return data;
   }
 
-  async graphql_transfers(objs) {
+  async graphTransfers(objs) {
     var data = await axios({
       url: networks[this.chainId].graph,
       method: "post",

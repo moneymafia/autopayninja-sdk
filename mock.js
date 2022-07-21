@@ -13,8 +13,12 @@ async function test() {
 	var a = await sdk.getUserTokenData('0x55349E0B114d305f94Cc1cbb2f574e7B5bEcDBd9', '0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
 	console.log(a);
 
-	// RPC Lookup - Super Slow
+	// RPC Lookup - Slow
 	var a = await sdk.getSubscriptionsByUser('0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
+	console.log(a);
+
+	// RPC Lookup - Slow - Get active Users for merchant
+	var a = await sdk.getActive('0x000000000000000000000000000000000000dead', '0x55349E0B114d305f94Cc1cbb2f574e7B5bEcDBd9', 6000);
 	console.log(a);
 
 	// Faster Lookup for Entries
@@ -38,9 +42,7 @@ async function test() {
 
 	var a = await sdk.suggestAllowance('100');
 	console.log(a);
-}
 
-async function test2() {
 	//gets token details
 	var a = await sdk.tokenDetails('0x55349e0b114d305f94cc1cbb2f574e7b5becdbd9');
 	console.log(a);
@@ -50,4 +52,5 @@ async function test2() {
 	console.log(a);
 }
 
-test2();
+
+test();

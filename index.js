@@ -26,8 +26,13 @@ const NETWORK = {
 };
 
 // check is address is valid
-async function isAddress(_address) {
-	return ethers.utils.isAddress(_address);
+
+async function checkAddress(_address) {
+	if (ethers.utils.isAddress(_address)) {
+		return ethers.utils.getAddress(_address);
+	} else {
+		return null;
+	}
 }
 
 // get token price
@@ -59,7 +64,6 @@ class AutoPayNinja {
 
 	secondsinaDay = 60;
 
-	// @param chainId: EVM Network ID
 	constructor(chainId) {
 		this.chainId = chainId;
 
@@ -68,8 +72,10 @@ class AutoPayNinja {
 		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, this.provider);
 	}
 
-	async tokenDetails(_address) {
-		const tokencontract = new ethers.Contract(_address, token_ABI, this.provider);
+	async tokenDetails(_token) {
+		var input_token = await checkAddress(_token);
+
+		const tokencontract = new ethers.Contract(input_token, token_ABI, this.provider);
 
 		var totalSupply = await tokencontract.totalSupply();
 		var symbol = await tokencontract.symbol();
@@ -84,9 +90,13 @@ class AutoPayNinja {
 	}
 
 	async getUserTokenData(_token, _user) {
-		if (isAddress(_token) && isAddress(_user)) {
-			const datax = await this.contract.balance_user(_user, _token);
-			const datap = await this.contract.allowance(_user, _token);
+		var input_user = await checkAddress(_user);
+		var input_token = await checkAddress(_token);
+
+		if (input_user && input_token) {
+			const datax = await this.contract.balance_user(input_user, input_token);
+			const datap = await this.contract.allowance(input_user, input_token);
+
 			return { balance: datax.toString(), allowance: datap.toString() };
 		}
 	}
@@ -104,7 +114,7 @@ class AutoPayNinja {
 		let valid = subs.cost.toString().length > 0;
 
 		return {
-			subId: _id.toString(),
+			subid: _id.toString(),
 			token: subs.token.toString(),
 			owner: subs.owner.toString(),
 			merchant: subs.merchant.toString(),
@@ -141,8 +151,30 @@ class AutoPayNinja {
 		return { users, merchants };
 	}
 
+	async getActive(_merchant, _token, _days) {
+		const max = await this.totalIds();
+		const active = [];
+
+		var input_merchant = await checkAddress(_merchant);
+		var input_token = await checkAddress(_token);
+
+		for (let index = 0; index < max; index++) {
+			const subs = await this.subscriptions(index);
+
+			if (subs.valid && parseInt(subs.unpaidInDay) < _days) {
+				if (subs.token == input_token && subs.merchant == input_merchant) {
+					active.push(index);
+				}
+			}
+		}
+		return { active: active };
+	}
+
 	async getSubscriptionLink(_merchant, _token, _cost, _initdays) {
-		if (ethers.utils.isAddress(_merchant) && ethers.utils.isAddress(_token)) {
+		var input_merchant = await checkAddress(_merchant);
+		var input_token = await checkAddress(_token);
+
+		if (input_merchant && input_token) {
 			const initdays = _initdays || 0;
 			return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
 		}
@@ -174,4 +206,4 @@ class AutoPayNinja {
 	}
 }
 
-module.exports = { AutoPayNinja, ABI, NETWORK, isAddress, getTokenPrice };
+module.exports = { AutoPayNinja, ABI, NETWORK, checkAddress, getTokenPrice };

@@ -13,7 +13,7 @@ async function test() {
 	var a = await sdk.getUserTokenData('0x55349E0B114d305f94Cc1cbb2f574e7B5bEcDBd9', '0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
 	console.log(a);
 
-	// RPC Lookup - Slow
+	// RPC Lookup - Slow - get active Subs for user/merchant
 	var a = await sdk.getSubscriptionsByUser('0x23Ed8Bbed4FD61d25189CA921448fE15F1B04301');
 	console.log(a);
 

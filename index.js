@@ -4,6 +4,9 @@ const ethers = require('ethers');
 
 const ABI = require('./contract/abi.json');
 
+const token_ABI = require('./contract/token.json');
+
+// Auto Pay Ninja Supported Networks
 const NETWORK = {
 	3: {
 		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
@@ -22,8 +25,35 @@ const NETWORK = {
 	},
 };
 
+// check is address is valid
+async function isAddress(_address) {
+	return ethers.utils.isAddress(_address);
+}
+
+// get token price
+async function getTokenPrice(_address, _chainId) {
+	let root = 'api';
+	let address = 'WETH';
+
+	if (_chainId == 137) {
+		root = 'polygon.api';
+		address = _address;
+	}
+
+	if (_chainId == 56) {
+		root = 'bsc.api';
+		address = _address;
+	}
+
+	const response = await axios.get(`https://${root}.0x.org/swap/v1/quote?buyToken=USDT&sellToken=${address}&sellAmount=100000000000000000`);
+
+	return response.data.price;
+}
+
 class AutoPayNinja {
 	chainId = null;
+
+	provider = null;
 
 	contract = null;
 
@@ -33,9 +63,19 @@ class AutoPayNinja {
 	constructor(chainId) {
 		this.chainId = chainId;
 
-		const provider = new ethers.providers.JsonRpcProvider(NETWORK[chainId].rpc);
+		this.provider = new ethers.providers.JsonRpcProvider(NETWORK[chainId].rpc);
 
-		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, provider);
+		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, this.provider);
+	}
+
+	async tokenDetails(_address) {
+		const tokencontract = new ethers.Contract(_address, token_ABI, this.provider);
+
+		var totalSupply = await tokencontract.totalSupply();
+		var symbol = await tokencontract.symbol();
+		var name = await tokencontract.name();
+
+		return { totalSupply: totalSupply.toString(), symbol: symbol.toString(), name: name.toString() };
 	}
 
 	async suggestAllowance(_amount) {
@@ -44,7 +84,7 @@ class AutoPayNinja {
 	}
 
 	async getUserTokenData(_token, _user) {
-		if (ethers.utils.isAddress(_token) && ethers.utils.isAddress(_user)) {
+		if (isAddress(_token) && isAddress(_user)) {
 			const datax = await this.contract.balance_user(_user, _token);
 			const datap = await this.contract.allowance(_user, _token);
 			return { balance: datax.toString(), allowance: datap.toString() };
@@ -134,4 +174,4 @@ class AutoPayNinja {
 	}
 }
 
-module.exports = { AutoPayNinja, ABI, NETWORK };
+module.exports = { AutoPayNinja, ABI, NETWORK, isAddress, getTokenPrice };

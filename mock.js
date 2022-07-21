@@ -1,4 +1,4 @@
-const { AutoPayNinja, ABI, NETWORK } = require('./index');
+const { AutoPayNinja, getTokenPrice } = require('./index');
 
 const sdk = new AutoPayNinja(3);
 
@@ -35,10 +35,18 @@ async function test() {
 	// Get Shareble Sub Link
 	var a = await sdk.getSubscriptionLink('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
 	console.log(a);
+
+	var a = await sdk.suggestAllowance('100');
+	console.log(a);
 }
 
 async function test2() {
-	var a = await sdk.suggestAllowance('100');
+	//gets token details
+	var a = await sdk.tokenDetails('0x55349e0b114d305f94cc1cbb2f574e7b5becdbd9');
+	console.log(a);
+
+	//gets token price in dollar
+	var a = await getTokenPrice('0x55349e0b114d305f94cc1cbb2f574e7b5becdbd9', 3);
 	console.log(a);
 }
 

@@ -197,7 +197,7 @@ class AutoPayNinja {
 			url: NETWORK[this.chainId].graph,
 			method: 'post',
 			data: {
-				query: `{ inits(${objs}) { id subid token merchant value timestamp} }`,
+				query: `{ inits(${objs}) {id hash token owner merchant value timestamp} }`,
 			},
 		}).then((res) => res.data.data.inits);
 
@@ -209,7 +209,7 @@ class AutoPayNinja {
 			url: NETWORK[this.chainId].graph,
 			method: 'post',
 			data: {
-				query: `{ transfers(${objs}) { id token from to value timestamp } }`,
+				query: `{ transfers(${objs}) { id hash token from to value timestamp } }`,
 			},
 		}).then((res) => res.data.data.transfers);
 

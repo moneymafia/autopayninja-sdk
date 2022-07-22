@@ -37,6 +37,10 @@ async function test2() {
 
 	var a = await sdk.graphTransfers(`where: {from: "0x23ed8bbed4fd61d25189ca921448fe15f1b04301"}`);
 	console.log(a);
+
+	// get all payments for a particular sub hash
+	var a = await sdk.graphTransfers(`where: {hash: "0x9e5d86e9faebad2d133d390fd613f924f0a80d821a75137881c598a119f54bb2"}`);
+	console.log(a);
 }
 
 async function test3() {
@@ -58,4 +62,4 @@ async function test4() {
 	console.log(a);
 }
 
-test();
+test2();

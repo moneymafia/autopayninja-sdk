@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const ethers = require('ethers');
+const { keccak256 } = require('ethers/lib/utils');
 
 const ABI = require('./contract/abi.json');
 
@@ -9,7 +10,7 @@ const token_ABI = require('./contract/token.json');
 // Auto Pay Ninja Supported Networks
 const NETWORK = {
 	3: {
-		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
+		contract: '0xd0E7f535874f2A6634068fbe636E56b4178e90A1',
 		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
 		rpc: 'https://rpc.ankr.com/eth_ropsten',
 	},
@@ -55,6 +56,22 @@ async function getTokenPrice(_address, _chainId) {
 	return response.data.price;
 }
 
+async function getSubscriptionLink(_merchant, _token, _cost, _initdays) {
+	var input_merchant = await checkAddress(_merchant);
+	var input_token = await checkAddress(_token);
+
+	if (input_merchant && input_token) {
+		const initdays = _initdays || 0;
+		return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
+	}
+	return null;
+}
+
+async function suggestAllowance(_amount) {
+	var data = _amount * 365 * 5;
+	return data.toString();
+}
+
 class AutoPayNinja {
 	chainId = null;
 
@@ -62,7 +79,7 @@ class AutoPayNinja {
 
 	contract = null;
 
-	secondsinaDay = 60;
+	secondsinaDay = 60 * 60 * 24;
 
 	constructor(chainId) {
 		this.chainId = chainId;
@@ -84,11 +101,6 @@ class AutoPayNinja {
 		return { totalSupply: totalSupply.toString(), symbol: symbol.toString(), name: name.toString() };
 	}
 
-	async suggestAllowance(_amount) {
-		var data = _amount * 365 * 5;
-		return data.toString();
-	}
-
 	async getUserTokenData(_token, _user) {
 		var input_user = await checkAddress(_user);
 		var input_token = await checkAddress(_token);
@@ -101,35 +113,40 @@ class AutoPayNinja {
 		}
 	}
 
-	async totalIds() {
-		const data = await this.contract.sub_index();
-		return data;
+	async canUserPay(_hash, _days) {
+		const data = await this.contract.canuserpay(_hash, _days);
+		return data.toString();
 	}
 
-	async subscriptions(_id) {
-		const subs = await this.contract.subscriptions(_id);
-		const aliveDuration = await this.contract.subsalive(_id);
-		const pendingInSec = await this.contract.pending_secs(_id);
+	async hash_id(_token, _owner, _merchant, _cost) {
+		const data = await this.contract.hash_id(_token, _owner, _merchant, _cost);
+		return data.toString();
+	}
+
+	async totalIds() {
+		const data = await this.contract.storeLength();
+		return data - 1;
+	}
+
+	async subscriptions(_hash) {
+		const subs = await this.contract.subscriptions(_hash);
+		const aliveDuration = await this.contract.subsalive(_hash);
+		const pendingInSec = await this.contract.pending_secs(_hash);
 
 		let valid = subs.cost.toString().length > 0;
 
 		return {
-			subid: _id.toString(),
+			hash: subs.hash.toString(),
 			token: subs.token.toString(),
 			owner: subs.owner.toString(),
 			merchant: subs.merchant.toString(),
 			cost: subs.cost.toString(),
-			lastpaidInSec: aliveDuration.toString(),
+			timestamp: aliveDuration.toString(),
 			unpaidInSec: pendingInSec.toString(),
 			unpaidInDay: pendingInSec.div(this.secondsinaDay).toString(),
 			unpaidCost: (subs.cost * pendingInSec.div(this.secondsinaDay)).toString(),
 			valid: valid,
 		};
-	}
-
-	async canUserPay(_id, _days) {
-		const data = await this.contract.canuserpay(_id, _days);
-		return data.toString();
 	}
 
 	async getSubscriptionsByUser(_user) {
@@ -138,13 +155,16 @@ class AutoPayNinja {
 		const merchants = [];
 
 		for (let index = 0; index < max; index++) {
-			const subs = await this.subscriptions(index);
+			const sub_hash = await this.contract.store(index);
+
+			const subs = await this.subscriptions(sub_hash);
+
 			if (subs.valid) {
 				if (subs.owner == _user) {
-					users.push(index);
+					users.push(subs.hash);
 				}
 				if (subs.merchant == _user) {
-					merchants.push(index);
+					merchants.push(subs.hash);
 				}
 			}
 		}
@@ -159,26 +179,17 @@ class AutoPayNinja {
 		var input_token = await checkAddress(_token);
 
 		for (let index = 0; index < max; index++) {
-			const subs = await this.subscriptions(index);
+			const sub_hash = await this.contract.store(index);
+
+			const subs = await this.subscriptions(sub_hash);
 
 			if (subs.valid && parseInt(subs.unpaidInDay) < _days) {
 				if (subs.token == input_token && subs.merchant == input_merchant) {
-					active.push(index);
+					active.push(sub_hash);
 				}
 			}
 		}
 		return { active: active };
-	}
-
-	async getSubscriptionLink(_merchant, _token, _cost, _initdays) {
-		var input_merchant = await checkAddress(_merchant);
-		var input_token = await checkAddress(_token);
-
-		if (input_merchant && input_token) {
-			const initdays = _initdays || 0;
-			return `https://autopay.ninja/join?chainId=${this.chainId}&merchant=${_merchant}&token=${_token}&cost=${_cost}&initdays=${initdays}`;
-		}
-		return null;
 	}
 
 	async graphSubscriptions(objs) {
@@ -206,4 +217,4 @@ class AutoPayNinja {
 	}
 }
 
-module.exports = { AutoPayNinja, ABI, NETWORK, checkAddress, getTokenPrice };
+module.exports = { AutoPayNinja, ABI, NETWORK, checkAddress, getTokenPrice, getSubscriptionLink, suggestAllowance };

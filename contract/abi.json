@@ -4,9 +4,9 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
 			},
 			{
 				"indexed": true,
@@ -40,6 +40,12 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			},
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "token",
@@ -70,9 +76,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "_hash",
+				"type": "bytes32"
 			}
 		],
 		"name": "txn_close",
@@ -111,9 +117,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "_hash",
+				"type": "bytes32"
 			},
 			{
 				"internalType": "uint256",
@@ -177,9 +183,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
+				"internalType": "bytes32",
+				"name": "_hash",
+				"type": "bytes32"
 			},
 			{
 				"internalType": "uint256",
@@ -201,25 +207,46 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
-			}
-		],
-		"name": "pending_secs",
-		"outputs": [
+				"internalType": "address",
+				"name": "_token",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_owner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_merchant",
+				"type": "address"
+			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "_cost",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
+		"name": "hash_id",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "sub_index",
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_hash",
+				"type": "bytes32"
+			}
+		],
+		"name": "pending_secs",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -236,6 +263,38 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"name": "store",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "storeLength",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
 			}
 		],
 		"name": "subsalive",
@@ -252,21 +311,26 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "bytes32",
 				"name": "",
-				"type": "uint256"
+				"type": "bytes32"
 			}
 		],
 		"name": "subscriptions",
 		"outputs": [
 			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
 			},
 			{
 				"internalType": "address",
 				"name": "token",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "owner",
 				"type": "address"
 			},
 			{

@@ -18,6 +18,7 @@ interface IERC20 {
 
 contract Service {
     event Transfer(
+        bytes32 hash,
         address indexed token,
         address indexed from,
         address indexed to,
@@ -25,27 +26,33 @@ contract Service {
     );
 
     event Init(
-        uint256 id,
+        bytes32 hash,
         address indexed token,
         address indexed owner,
         address indexed merchant,
         uint256 value
     );
 
-    uint256 private secondsinday = 60;
-
-    uint256 public sub_index;
-
     struct Plan {
-        address owner;
+        bytes32 hash;
         address token;
+        address owner;
         address merchant;
         uint256 cost;
     }
 
-    mapping(uint256 => Plan) public subscriptions;
+    uint256 private secondsinday = 60 * 60 * 24;
 
-    mapping(uint256 => uint256) public subsalive;
+    mapping(bytes32 => Plan) public subscriptions;
+
+    mapping(bytes32 => uint256) public subsalive;
+
+    bytes32[] public store;
+
+    // get Store Length
+    function storeLength() public view returns (uint256) {
+        return store.length;
+    }
 
     // get user allowance for token
     function allowance(address _user, address _token)
@@ -66,8 +73,12 @@ contract Service {
     }
 
     // check if the user has enough tokens to pay for the subscription
-    function canuserpay(uint256 _id, uint256 _days) public view returns (bool) {
-        Plan memory subscription = subscriptions[_id];
+    function canuserpay(bytes32 _hash, uint256 _days)
+        public
+        view
+        returns (bool)
+    {
+        Plan memory subscription = subscriptions[_hash];
 
         if (
             subscription.cost * _days <
@@ -85,16 +96,27 @@ contract Service {
     }
 
     // get the number of seconds unpaid in the subscription
-    function pending_secs(uint256 _id) public view returns (uint256) {
-        if (block.timestamp > subsalive[_id]) {
-            return block.timestamp - subsalive[_id];
+    function pending_secs(bytes32 _hash) public view returns (uint256) {
+        if (block.timestamp > subsalive[_hash]) {
+            return block.timestamp - subsalive[_hash];
         } else {
             return 0;
         }
     }
 
+    //get hash for sub
+    function hash_id(
+        address _token,
+        address _owner,
+        address _merchant,
+        uint256 _cost
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_token, _owner, _merchant, _cost));
+    }
+
     // internal function - pays the merchent for the subscription
     function _safepay(
+        bytes32 _hash,
         address _token,
         address _owner,
         address _merchant,
@@ -114,7 +136,7 @@ contract Service {
 
         IERC20(_token).transferFrom(_owner, _merchant, _amount);
 
-        emit Transfer(_token, _owner, _merchant, _amount);
+        emit Transfer(_hash, _token, _owner, _merchant, _amount);
     }
 
     // initialize the subscription service /// _initdays should be 0 if no advance payment
@@ -124,60 +146,72 @@ contract Service {
         uint256 _cost,
         uint256 _initdays
     ) external {
+        bytes32 sub_hash = hash_id(_token, msg.sender, _merchant, _cost);
+
         require((_cost > 0), "Cost must be greater than 0");
 
-        if (_initdays > 0) {
-            _safepay(_token, msg.sender, _merchant, _cost * _initdays);
-        }
-
         Plan memory newSubscription = Plan({
+            hash: sub_hash,
             owner: msg.sender,
             token: _token,
             merchant: _merchant,
             cost: _cost
         });
 
-        subscriptions[sub_index] = newSubscription;
+        subscriptions[sub_hash] = newSubscription;
 
-        subsalive[sub_index] = block.timestamp;
+        if (subsalive[sub_hash] < 100) {
+            store.push(sub_hash);
 
-        emit Init(sub_index, _token, msg.sender, _merchant, _cost);
+            emit Init(sub_hash, _token, msg.sender, _merchant, _cost);
+        }
 
-        sub_index += 1;
+        if (_initdays > 0) {
+            _safepay(
+                sub_hash,
+                _token,
+                msg.sender,
+                _merchant,
+                _cost * _initdays
+            );
+        }
+
+        subsalive[sub_hash] = block.timestamp;
     }
 
     // close subscription
-    function txn_close(uint256 _id) external {
-        Plan storage subscription = subscriptions[_id];
+    function txn_close(bytes32 _hash) external {
+        Plan storage subscription = subscriptions[_hash];
 
         require(
             (subscription.owner == msg.sender) ||
                 (subscription.merchant == msg.sender)
         );
 
-        delete subscriptions[_id];
+        delete subscriptions[_hash];
     }
 
     // process subscription
-    function txn_run(uint256 _id, uint256 _days) external {
-        Plan memory subscription = subscriptions[_id];
+    function txn_run(bytes32 _hash, uint256 _days) external {
+        Plan memory subscription = subscriptions[_hash];
 
         require(_days > 0);
 
         require((subscription.cost > 0), "Not an active subscription");
 
         require(
-            (subsalive[_id] + (secondsinday * _days) <= block.timestamp),
+            (subsalive[_hash] + (secondsinday * _days) <= block.timestamp),
             "Subscription Not Timed"
         );
 
         _safepay(
+            subscription.hash,
             subscription.token,
             subscription.owner,
             subscription.merchant,
             subscription.cost * _days
         );
 
-        subsalive[_id] = subsalive[_id] + (secondsinday * _days);
+        subsalive[_hash] = subsalive[_hash] + (secondsinday * _days);
     }
 }

@@ -6,8 +6,6 @@ const ABI = require('./utils/abi.json');
 
 const token_ABI = require('./utils/token.json');
 
-const { encrypt } = require('./utils');
-
 // Auto Pay Ninja Supported Networks
 const NETWORK = {
 	3: {

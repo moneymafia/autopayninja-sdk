@@ -51,6 +51,10 @@ async function test3() {
 	//decode link
 	var b = await atob(a);
 	console.log(b);
+
+	//suggest allowance
+	var a = await suggestAllowance('10000000');
+	console.log(a);
 }
 
 async function test4() {

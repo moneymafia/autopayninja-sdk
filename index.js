@@ -1,11 +1,11 @@
 const axios = require("axios");
 
 const ethers = require("ethers");
-const { keccak256 } = require("ethers/lib/utils");
 
-const ABI = require("./contract/abi.json");
+const ABI = require("./utils/abi.json");
 
-const token_ABI = require("./contract/token.json");
+const token_ABI = require("./utils/token.json");
+
 const { encrypt } = require("./utils");
 
 // Auto Pay Ninja Supported Networks

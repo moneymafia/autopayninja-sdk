@@ -225,4 +225,6 @@ module.exports = {
 	getActive,
 	graphSubscriptions,
 	graphTransfers,
+	ABI,
+	NETWORK,
 };

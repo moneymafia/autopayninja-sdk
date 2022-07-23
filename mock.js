@@ -46,7 +46,7 @@ async function test2() {
 async function test3() {
 	// Get Shareble Sub Link
 	var a = await encodeSubscription('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
-	console.log(a);
+	console.log('https://autopay.ninja/subscribe/' + a);
 
 	var b = await decodeSubscription(a);
 	console.log(b);
@@ -63,4 +63,3 @@ async function test4() {
 }
 
 test3();
-

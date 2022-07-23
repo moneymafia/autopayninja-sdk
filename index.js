@@ -4,26 +4,9 @@ const ethers = require('ethers');
 
 const ABI = require('./utils/abi.json');
 
-const token_ABI = require('./utils/token.json');
+const NETWORK = require('./utils/network.json');
 
-// Auto Pay Ninja Supported Networks
-const NETWORK = {
-	3: {
-		contract: '0xd0E7f535874f2A6634068fbe636E56b4178e90A1',
-		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://rpc.ankr.com/eth_ropsten',
-	},
-	56: {
-		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
-		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://rpc.ankr.com/eth_ropsten',
-	},
-	137: {
-		contract: '0x15068063F353D946462BCEb9464A8Dce23B9814d',
-		graph: 'https://api.thegraph.com/subgraphs/name/moneymafia/autopayninja',
-		rpc: 'https://rpc.ankr.com/eth_ropsten	',
-	},
-};
+const token_ABI = require('./utils/token.json');
 
 // check is address is valid
 

@@ -44,9 +44,14 @@ async function encodeSubscription(_merchant, _token, _cost, _initdays = '0') {
 	});
 
 	if (input_merchant && input_token) {
-		return btoa(obj);
+		return Buffer.from(obj).toString('base64');
 	}
 	return null;
+}
+
+async function decodeSubscription(_hash) {
+
+	return Buffer.from(_hash, 'base64').toString();
 }
 
 async function suggestAllowance(_amount) {
@@ -208,6 +213,7 @@ module.exports = {
 	setChain,
 	checkAddress,
 	encodeSubscription,
+	decodeSubscription,
 	suggestAllowance,
 	getTokenPrice,
 	getUserTokenData,

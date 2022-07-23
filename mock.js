@@ -2,6 +2,7 @@ const {
 	setChain,
 	checkAddress,
 	encodeSubscription,
+	decodeSubscription,
 	suggestAllowance,
 	getTokenPrice,
 	getUserTokenData,
@@ -16,7 +17,7 @@ const {
 	graphTransfers,
 } = require('./index');
 
-const sdk = setChain(3);
+setChain(3);
 
 async function test() {
 	// check if address valid
@@ -28,7 +29,7 @@ async function test() {
 	console.log('https://autopay.ninja/subscribe/' + a);
 
 	//decode link
-	var b = await atob(a);
+	var b = await decodeSubscription(a);
 	console.log(b);
 
 	//suggest allowance
@@ -84,4 +85,4 @@ async function test2() {
 	console.log(a);
 }
 
-test2();
+test();

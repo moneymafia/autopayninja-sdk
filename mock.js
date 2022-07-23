@@ -1,4 +1,4 @@
-const { AutoPayNinja, getTokenPrice, suggestAllowance, encodeSubscription, decodeSubscription } = require('./index');
+const { AutoPayNinja, suggestAllowance, encodeSubscription } = require('./index');
 
 const sdk = new AutoPayNinja(3);
 
@@ -48,7 +48,8 @@ async function test3() {
 	var a = await encodeSubscription('0x8b41e67D6968327664Cf9313b136A0B076000214', '0x8b41e67D6968327664Cf9313b136A0B076000214', '1');
 	console.log('https://autopay.ninja/subscribe/' + a);
 
-	var b = await decodeSubscription(a);
+	//decode link
+	var b = await atob(a);
 	console.log(b);
 }
 
@@ -58,7 +59,7 @@ async function test4() {
 	console.log(a);
 
 	//gets token price in dollar
-	var a = await getTokenPrice('0x55349e0b114d305f94cc1cbb2f574e7b5becdbd9', 3);
+	var a = await sdk.getTokenPrice('0x55349e0b114d305f94cc1cbb2f574e7b5becdbd9');
 	console.log(a);
 }
 

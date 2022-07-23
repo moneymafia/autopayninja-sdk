@@ -8,34 +8,12 @@ const NETWORK = require('./utils/network.json');
 
 const token_ABI = require('./utils/token.json');
 
-// check is address is valid
-
 async function checkAddress(_address) {
 	if (ethers.utils.isAddress(_address)) {
 		return ethers.utils.getAddress(_address);
 	} else {
 		return null;
 	}
-}
-
-// get token price
-async function getTokenPrice(_address, _chainId) {
-	let root = 'api';
-	let address = 'WETH';
-
-	if (_chainId == 137) {
-		root = 'polygon.api';
-		address = _address;
-	}
-
-	if (_chainId == 56) {
-		root = 'bsc.api';
-		address = _address;
-	}
-
-	const response = await axios.get(`https://${root}.0x.org/swap/v1/quote?buyToken=USDT&sellToken=${address}&sellAmount=100000000000000000`);
-
-	return response.data.price;
 }
 
 async function encodeSubscription(_merchant, _token, _cost, _initdays = '0') {
@@ -49,18 +27,10 @@ async function encodeSubscription(_merchant, _token, _cost, _initdays = '0') {
 		initdays: _initdays,
 	});
 
-	var hash = Buffer.from(obj).toString('base64');
-
 	if (input_merchant && input_token) {
-		return hash;
+		return btoa(obj);
 	}
 	return null;
-}
-
-async function decodeSubscription(_hash) {
-	var obj = Buffer.from(_hash, 'base64').toString('utf8');
-
-	return obj;
 }
 
 async function suggestAllowance(_amount) {
@@ -83,6 +53,25 @@ class AutoPayNinja {
 		this.provider = new ethers.providers.JsonRpcProvider(NETWORK[chainId].rpc);
 
 		this.contract = new ethers.Contract(NETWORK[chainId].contract, ABI, this.provider);
+	}
+
+	async getTokenPrice(_address) {
+		let root = 'api';
+		let address = 'WETH';
+
+		if (_chainId == this.chainId) {
+			root = 'polygon.api';
+			address = _address;
+		}
+
+		if (_chainId == this.chainId) {
+			root = 'bsc.api';
+			address = _address;
+		}
+
+		const response = await axios.get(`https://${root}.0x.org/swap/v1/quote?buyToken=USDT&sellToken=${address}&sellAmount=100000000000000000`);
+
+		return response.data.price;
 	}
 
 	async tokenDetails(_token) {
@@ -222,8 +211,6 @@ module.exports = {
 	ABI,
 	NETWORK,
 	checkAddress,
-	getTokenPrice,
 	encodeSubscription,
-	decodeSubscription,
 	suggestAllowance,
 };

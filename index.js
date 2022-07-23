@@ -2,11 +2,11 @@ const axios = require('axios');
 
 const ethers = require('ethers');
 
-const ABI = require('./utils/abi.json');
-
 const NETWORK = require('./utils/network.json');
 
-const token_ABI = require('./utils/token.json');
+const ABI = require('./utils/abi.json');
+
+const TOKENABI = require('./utils/token.json');
 
 const secondsinaDay = 60 * 60 * 24;
 
@@ -92,7 +92,7 @@ async function getUserTokenData(_token, _user) {
 async function tokenDetails(_token) {
 	var input_token = await checkAddress(_token);
 
-	const tokencontract = new ethers.Contract(input_token, token_ABI, provider);
+	const tokencontract = new ethers.Contract(input_token, TOKENABI, provider);
 
 	var totalSupply = await tokencontract.totalSupply();
 	var symbol = await tokencontract.symbol();
@@ -227,4 +227,5 @@ module.exports = {
 	graphTransfers,
 	ABI,
 	NETWORK,
+	TOKENABI,
 };

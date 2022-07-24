@@ -50,7 +50,7 @@ async function encodeSubscription(_merchant, _token, _cost, _initdays = '0') {
 }
 
 async function decodeSubscription(_hash) {
-	return Buffer.from(_hash, 'base64').toString();
+	return JSON.parse(Buffer.from(_hash, 'base64').toString());
 }
 
 async function suggestAllowance(_amount) {
